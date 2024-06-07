@@ -3,7 +3,7 @@ import { Howl, Howler } from "howler";
 import introSound from "../../assets/sounds/backgrounds/sound.mp3";
 import BouncingText from "../Animations/AnimatedCharacters/bouncingText";
 
-const maxIntroTime = 30000;
+const maxIntroTime = 300000;
 
 function IntroOverlay({ setIsLoading }) {
   const [time, setTime] = useState(maxIntroTime);
@@ -14,6 +14,7 @@ function IntroOverlay({ setIsLoading }) {
   const timeIntervalRef = useRef(null);
   const canvasRef = useRef(null);
   const analyserRef = useRef(null);
+  const gainNodeRef = useRef(null);
   const animationIdRef = useRef(null);
   const audioSourceRef = useRef(null);
 
@@ -22,10 +23,9 @@ function IntroOverlay({ setIsLoading }) {
       new Howl({
         src: [introSound],
         html5: true,
-        autoplay: true,
-        loop: true,
+        // autoplay: true,
+        // loop: true,
         volume: 0,
-        onunlock: () => {},
       }),
     []
   );
@@ -84,9 +84,7 @@ function IntroOverlay({ setIsLoading }) {
   }, [isStart]);
 
   // vẽ canvas
-  const drawWaveform = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
+  const drawLineWaveform = (canvas, ctx) => {
     const analyser = analyserRef.current;
 
     if (!ctx || !analyser) return;
@@ -98,10 +96,6 @@ function IntroOverlay({ setIsLoading }) {
     // Get the Data array (dữ liệu miền thời gian)
     var timeData = new Uint8Array(bufferLength);
     analyser.getByteTimeDomainData(timeData);
-    //Get the Data array (dữ liệu phổ )
-    var frequencyData = new Uint8Array(bufferLength);
-    analyser.getByteFrequencyData(frequencyData);
-
     // draw
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
@@ -122,6 +116,24 @@ function IntroOverlay({ setIsLoading }) {
       ctx.lineTo(x, y);
     }
     ctx.stroke();
+  };
+  const draColWaveform = (canvas, ctx) => {
+    const analyser = analyserRef.current;
+
+    if (!ctx || !analyser) return;
+
+    // Creating output array (according to documentation https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API)
+    analyser.fftSize = 512;
+    // [32, 64, 128, 256, 512, 1024, 2048]
+    var bufferLength = analyser.frequencyBinCount;
+    //Get the Data array (dữ liệu phổ )
+    var frequencyData = new Uint8Array(bufferLength);
+    analyser.getByteFrequencyData(frequencyData);
+
+    // draw
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
     // Bar visualize
     const barWidth = (canvasWidth / bufferLength) * 2.5;
     let barHeight;
@@ -135,17 +147,96 @@ function IntroOverlay({ setIsLoading }) {
       x += barWidth + 1;
     }
   };
+  // Function to calculate average frequency value
+  const getAvg = (dataArray) => {
+    const total = dataArray.reduce((sum, value) => sum + value, 0);
+    return total / dataArray.length;
+  };
+  const drawWaveformCircle = (w, h, ctx) => {
+    const analyser = analyserRef.current;
+    if (!ctx || !analyser) return;
+    // get data bound
+    // analyser.fftSize = 1024;
+    // [32, 64, 128, 256, 512, 1024, 2048]
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    analyser.getByteFrequencyData(dataArray);
+    // get data for circle
+    const centerX = w / 2;
+    const centerY = h / 2;
+    const radius = Math.min(w, h) / 6; // Radius of the circle
+    const waveDetail = 360; // Number of points for the wave
+    const waveAmplitude = 20; // Amplitude of the wave
+    const avg = getAvg(dataArray) * gainNodeRef.current.gain.value;
+    // start path main line
+    ctx.beginPath();
+    // style path
+    ctx.strokeStyle = "lime";
+    ctx.lineWidth = 2;
+    // create circle
+    ctx.arc(centerX, centerY, avg + radius, Math.PI * 2, false);
+    // start draw
+    ctx.stroke();
+    // end path
+    ctx.closePath();
+    // Draw wave outline
+    ctx.beginPath();
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 1;
 
+    const waveRadius = avg + radius;
+    const step = Math.floor(bufferLength / waveDetail);
+
+    for (let i = 0; i <= waveDetail; i++) {
+      const angle = (i / waveDetail) * Math.PI * 2;
+      const dataIdx = i * step;
+      const pointRadius =
+        waveRadius + (dataArray[dataIdx] / 255.0) * waveAmplitude;
+      const x = centerX + pointRadius * Math.cos(angle);
+      const y = centerY + pointRadius * Math.sin(angle);
+
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    }
+
+    ctx.closePath();
+    ctx.stroke();
+  };
   const updateWaveform = () => {
-    drawWaveform();
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    // Clear canvas each call
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    drawLineWaveform(canvas, ctx);
+    draColWaveform(canvas, ctx);
+    drawWaveformCircle(canvasWidth, canvasHeight, ctx);
     animationIdRef.current = requestAnimationFrame(updateWaveform);
   };
-  // Create abalyzer, conncect to media source(bài nhạc đang play), connect to destination (thiết bị đầu ra)
+  // Create abalyzer, conncect to media source(bài nhạc đang play), connect to destination (thiết bị đầu ra), set canvas size
+  const setCanvasSize = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.width = window.innerWidth;
+      canvas.height = 500;
+    }
+  };
   useEffect(() => {
+    setCanvasSize();
+    window.addEventListener("resize", setCanvasSize);
+
     if (sound && !analyserRef.current) {
       const analyser = Howler.ctx.createAnalyser();
       analyserRef.current = analyser;
-
+      if (!gainNodeRef.current) {
+        gainNodeRef.current = Howler.ctx.createGain();
+        gainNodeRef.current.gain.value = 1;
+        gainNodeRef.current.connect(analyser);
+      }
       if (!audioSourceRef.current) {
         audioSourceRef.current = Howler.ctx.createMediaElementSource(
           sound._sounds[0]._node
@@ -157,6 +248,7 @@ function IntroOverlay({ setIsLoading }) {
     }
     return () => {
       cancelAnimationFrame(animationIdRef.current);
+      window.removeEventListener("resize", setCanvasSize);
     };
   }, [sound]);
 
@@ -176,7 +268,7 @@ function IntroOverlay({ setIsLoading }) {
   };
 
   return (
-    <div className="h-screen w-screen bg-black">
+    <div className="h-screen w-screen bg-black relative">
       <div className="text-white text-2xl font-semibold">
         LOADING
         <BouncingText
@@ -188,12 +280,7 @@ function IntroOverlay({ setIsLoading }) {
         />
       </div>
       <p className="text-white">{Math.floor(time / 1000)}</p>
-      <canvas
-        ref={canvasRef}
-        id="waveformCanvas"
-        width="800"
-        height="200"
-      ></canvas>
+
       <div
         className="text-white p-2 bg-purple-500 border-1 cursor-pointer"
         onClick={handleStart}
@@ -211,6 +298,12 @@ function IntroOverlay({ setIsLoading }) {
           </div>
         )}
       </div>
+      <canvas
+        ref={canvasRef}
+        id="waveformCanvas"
+        // className="fixed inset-0 pointer-events-none"
+        height="800px"
+      ></canvas>
     </div>
   );
 }
