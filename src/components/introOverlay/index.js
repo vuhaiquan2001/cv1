@@ -83,7 +83,7 @@ function IntroOverlay({ setIsLoading }) {
     return () => clearInterval(timeIntervalRef.current);
   }, [isStart]);
 
-  // draw canvas
+  // vẽ canvas
   const drawWaveform = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -92,37 +92,55 @@ function IntroOverlay({ setIsLoading }) {
     if (!ctx || !analyser) return;
 
     // Creating output array (according to documentation https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API)
-    analyser.fftSize = 2048;
+    analyser.fftSize = 512;
+    // [32, 64, 128, 256, 512, 1024, 2048]
     var bufferLength = analyser.frequencyBinCount;
-    var dataArray = new Uint8Array(bufferLength);
-    // Get the Data array
-    analyser.getByteTimeDomainData(dataArray);
+    // Get the Data array (dữ liệu miền thời gian)
+    var timeData = new Uint8Array(bufferLength);
+    analyser.getByteTimeDomainData(timeData);
+    //Get the Data array (dữ liệu phổ )
+    var frequencyData = new Uint8Array(bufferLength);
+    analyser.getByteFrequencyData(frequencyData);
 
+    // draw
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
     const sliceWidth = canvasWidth / bufferLength;
-
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+    // line visualize
     ctx.lineWidth = 2;
     ctx.strokeStyle = "rgb(0, 255, 0)";
     ctx.beginPath();
 
     for (let i = 0; i < bufferLength; i++) {
       const x = i * sliceWidth;
-      const v = dataArray[i] / 128.0 - 1;
+      const v = timeData[i] / 128.0 - 1;
       const y = canvasHeight / 2 + (canvasHeight * v) / 2;
       const color = Math.floor((255 * (v + 1)) / 2);
       ctx.strokeStyle = `rgb(${color}, ${255 - color}, 0)`;
       ctx.lineTo(x, y);
     }
     ctx.stroke();
+    // Bar visualize
+    const barWidth = (canvasWidth / bufferLength) * 2.5;
+    let barHeight;
+    let x = 0;
+    for (let i = 0; i < bufferLength; i++) {
+      barHeight = frequencyData[i] / 2;
+
+      ctx.fillStyle = `rgb(${barHeight + 100} 50 50)`;
+      ctx.fillRect(x, canvasHeight - barHeight / 2, barWidth, barHeight);
+
+      x += barWidth + 1;
+    }
   };
 
   const updateWaveform = () => {
     drawWaveform();
     animationIdRef.current = requestAnimationFrame(updateWaveform);
   };
-
+  // Create abalyzer, conncect to media source(bài nhạc đang play), connect to destination (thiết bị đầu ra)
   useEffect(() => {
     if (sound && !analyserRef.current) {
       const analyser = Howler.ctx.createAnalyser();
