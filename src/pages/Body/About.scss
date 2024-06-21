@@ -1,3 +1,11 @@
+.box-left::before {
+    content: url('../../assets/images/icons/decoUpperRightBig.svg');
+    transform: rotate(270deg);
+    position: absolute;
+    top: -5px;
+    left: 0px;
+}
+
 .robot-image {
     transform: translate(0, -7.5%);
     height: 800px;
@@ -41,11 +49,14 @@
     }
     92% {
         background-image: url('../../assets/images/character/glitch1.png');
+        filter: hue-rotate(10deg) saturate(150%);
     }
     95% {
         background-image: url('../../assets/images/character/glitch2.png');
+        filter: hue-rotate(30deg) saturate(180%);
     }
-    97% {
+    97.5% {
         background-image: url('../../assets/images/character/glitch3.png');
+        filter: hue-rotate(50deg) saturate(200%);
     }
 }

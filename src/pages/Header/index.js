@@ -30,9 +30,9 @@ function Header() {
                     </a>
                     <div className="nav-link center flex md:hidden">
                         <svg width="28" height="26" viewBox="0 0 28 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <line y1="2" x2="28" y2="2" stroke="black" stroke-width="4"></line>
-                            <line y1="24" x2="28" y2="24" stroke="black" stroke-width="4"></line>
-                            <line y1="13" x2="28" y2="13" stroke="black" stroke-width="4"></line>
+                            <line y1="2" x2="28" y2="2" stroke="black" strokeWidth="4"></line>
+                            <line y1="24" x2="28" y2="24" stroke="black" strokeWidth="4"></line>
+                            <line y1="13" x2="28" y2="13" stroke="black" strokeWidth="4"></line>
                         </svg>
                     </div>
                     <a className="nav-link flex center" href="presskit" target="_blank" rel="noopener noreferrer">
