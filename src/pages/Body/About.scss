@@ -1,0 +1,51 @@
+.robot-image {
+    transform: translate(0, -7.5%);
+    height: 800px;
+    width: 300px;
+    background-image: url('../../assets/images/character/character.svg');
+    background-repeat: no-repeat;
+    animation: glitch 3.5s infinite steps(1);
+}
+// Responsive
+@media (min-width: 768px) {
+    .robot-image {
+        transform: translate(0, -15.5%);
+        height: 650px;
+        object-fit: contain;
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        z-index: 5;
+    }
+}
+
+@media (min-width: 1024px) {
+    .robot-image {
+        transform: translate(10%, -15.5%);
+        height: 750px;
+    }
+}
+
+@media (min-width: 1366px) {
+    .robot-image {
+        transform: translate(20%, -14.5%);
+        height: 800px;
+    }
+}
+// Animate
+@keyframes glitch {
+    0%,
+    100% {
+        background-image: url('../../assets/images/character/character.svg');
+    }
+    92% {
+        background-image: url('../../assets/images/character/glitch1.png');
+    }
+    95% {
+        background-image: url('../../assets/images/character/glitch2.png');
+    }
+    97% {
+        background-image: url('../../assets/images/character/glitch3.png');
+    }
+}

@@ -1,18 +1,13 @@
-import { useEffect, useState } from "react";
-import IntroOverlay from "./components/introOverlay";
+import Main from './pages/Body'
+import Header from './pages/Header'
+
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  // nếu loading bật intro
-  if (isLoading) {
-    return <IntroOverlay setIsLoading={setIsLoading} />;
-  }
-  // else Router page
-  return (
-    <div className="App">
-      <div className="text-red-400 bg-black">App</div>
-    </div>
-  );
+    return (
+        <div className="bg-white w-screen h-screen">
+            <Header />
+            <Main />
+            <footer></footer>
+        </div>
+    )
 }
-
-export default App;
+export default App
