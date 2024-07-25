@@ -3,9 +3,35 @@
     transform: rotate(270deg);
     position: absolute;
     top: -5px;
-    left: 0px;
+    left: 1px;
 }
-
+.box-right::before {
+    content: url('../../assets/images/icons/decoUpperRightBig.svg');
+    position: absolute;
+    top: -2px;
+    right: -2px;
+}
+.box-right::after {
+    content: url('../../assets/images/icons/decoBottomCenterBig.svg');
+    // transform: rotate(270deg);
+    position: absolute;
+    bottom: 0;
+    right: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+@media (min-width: 1366px) {
+    .box-right::after {
+        content: url('../../assets/images/icons/decoBottomCenterBig.svg');
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        width: 172px;
+    }
+}
 .robot-image {
     transform: translate(0, -7.5%);
     height: 800px;

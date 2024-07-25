@@ -9,6 +9,9 @@ module.exports = {
             borderColor: {
                 'custom-black': '#000000',
             },
+            width: {
+                unset: 'unset',
+            },
         },
     },
     plugins: [

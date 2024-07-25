@@ -1,8 +1,7 @@
 import React from 'react'
-import robot from '../../assets/images/character/character.svg'
 import './About.scss'
 import { motion } from 'framer-motion'
-import BallFollowMouse from '../../components/Animations/BallFollowMouse'
+import { useSoundContext } from '../../components/Containers/Providers/Sound'
 
 const pathVariants = {
     hidden: { opacity: 0, pathLength: 0 },
@@ -13,20 +12,20 @@ const pathVariants = {
             duration: 2,
             ease: 'easeInOut',
         },
+        delay: 1,
     },
 }
 
 function About() {
+    const { sound } = useSoundContext()
     return (
         <section id="about" className="m-2 md:m-5 lg:mt-0">
-            {/* <BallFollowMouse /> */}
             <div className="flex flex-wrap flex-row ml-[0.625rem] shadow-offsetLeft md:h-full">
                 <div className="box-left relative z-[1] border-2 border-solid border-black flex-1 p-7 pb-12 w-full md:py-14 md:px-16 md:border-r-0 md:flex-1">
                     <div className="robot-image"></div>
-                    {/* <img className="robot-image" src={robot} alt="robot"></img> */}
                 </div>
-                <div className="relative z-[1] flex-1 p-7 pb-12 border-2 border-solid border-black md:py-14 md:px-16 xl:h-[650px] xl:flex-[1.5]">
-                    <svg width="423" height="161" viewBox="0 0 423 161" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div className="box-right relative z-[1] flex-1 p-7 pb-12 border-2 border-solid border-black md:py-14 md:px-16 xl:h-[650px] xl:flex-[1.5]">
+                    <svg className="mb-4 w-full xl:mb-14 xl:w-unset" width="423" height="161" viewBox="0 0 423 161" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <motion.path d="M18.7982 46.8428H23.7805L39.4674 62.6167H52.391V61.7899L32.7662 45.1022C42.5786 41.5123 48.2137 33.8321 48.2137 23.454C48.2137 9.63831 38.0749 1.30537 21.0827 1.30537H10.4435V62.6167H18.7764V46.8428H18.7982ZM18.7982 9.09437H21.235C32.5921 9.09437 39.2063 14.9035 39.2063 24.7812C39.2063 34.0932 33.2448 39.9023 23.6717 39.9023H18.7764V9.09437H18.7982Z" fill="black" variants={pathVariants} initial="hidden" animate="visible" />
                         <motion.path
                             d="M91.5971 63.9221C111.135 63.9221 125.516 50.4328 125.516 31.9611C125.516 13.4894 111.2 0 91.6841 0C72.1681 0 57.6779 13.4894 57.6779 31.9611C57.6779 50.4328 72.0593 63.9221 91.5971 63.9221ZM91.6841 8.02834C106 8.02834 116.117 17.906 116.117 31.9611C116.117 46.0161 105.978 55.9155 91.6841 55.9155C77.3898 55.9155 67.0987 46.0161 67.0987 31.9611C67.0987 17.906 77.3245 8.02834 91.6841 8.02834Z"
@@ -66,6 +65,17 @@ function About() {
                         <motion.path d="M351.572 83.3729C339.475 83.3729 333.1 89.8347 333.1 101.845V108.698H328.618L326.986 116.139H333.1V145.968H341.368V116.139H360.405V145.968H368.673V101.845C368.673 89.4214 363.038 83.3729 351.594 83.3729H351.572ZM360.405 108.698H341.368V100.604C341.368 94.0774 344.392 91.1402 350.941 91.1402C357.49 91.1402 360.427 94.0774 360.427 100.604V108.698H360.405Z" fill="black" variants={pathVariants} initial="hidden" animate="visible" />
                         <motion.path d="M414.341 84.6783V102.258H413.927L392.692 84.6783H384.577V145.99H393.258V95.7961H393.672L414.341 111.483V145.99H423V84.6783H414.341Z" fill="black" variants={pathVariants} initial="hidden" animate="visible" />
                     </svg>
+                    <p className="text-black font-normal no-underline text-base">
+                        Robot Gentleman is the independent game developer based in Poznań, Poland, easily recognizable by our signature headgear.
+                        <br />
+                        <br />
+                        <b>If you've ever seen a robot in a top hat, that's probably one of us!</b>
+                    </p>
+                    <br />
+
+                    <p className="text-black font-normal no-underline text-base">
+                        The studio is known for the warmly received dark comedy atomic adventure <i>60 Seconds!</i> and its spiritual successor – <i>60 Parsecs!</i> Following the success of the <i>60!</i> series, we plan to continue developing unconventional games with twisted stories, while actively engaging with the global gamedev community and supporting the local indie scene in our home city of Poznań, Poland.
+                    </p>
                 </div>
             </div>
         </section>
